@@ -1,0 +1,36 @@
+* dashy nix flake
+
+nix flake for https://dashy.to/
+
+** example usage
+#+begin_src nix
+  {
+    inputs = {
+      nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+      dashy.url = "github:christian-blades-cb/dashy-flake";
+    };
+
+    outputs = inputs @ {self, nixpkgs, dashy}: {
+      nixosConfigurations.dashboard = nixpkgs.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          {
+            services.dashy = {
+              enable = true;
+              host = "127.0.0.1";
+              port = 4000;
+            };
+
+            services.nginx.virtualHosts."dashboard.localdomain" = {
+              locations."/" = {
+                proxyPass = "http://localhost:4000";
+              };
+            };
+
+            networking.firewall.allowedTCPPorts = [ 80 443 ];
+          }
+        ];
+      };
+    }
+  }
+#+end_src
