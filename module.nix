@@ -13,7 +13,7 @@ in {
       example = "127.0.0.1";
       description = "ip to bind the service";
     };
-    
+
     port = lib.mkOption rec {
       type = lib.types.port;
       default = 4000;
@@ -88,7 +88,7 @@ sections:
 
   config = lib.mkIf cfg.enable {
     users.groups."dashy" = {};
-    
+
     users.users."dashy" = {
       isSystemUser = true;
       group = "dashy";
@@ -107,22 +107,21 @@ sections:
           PORT = toString cfg.port;
         };
         path = with pkgs; [ bashInteractive ffmpeg nodejs-16_x openssl yarn python3 ];
-      
+
         script = ''
           #!/bin/sh
-  
-          if [ ! -e /var/lib/dashy/public/conf.yml ]; then        
+
+          if [ ! -d /var/lib/dashy/public ]; then
             umask 077
             mkdir -p /var/lib/dashy/public
             cp -R ${package}/lib/node_modules/Dashy/public/ /var/lib/dashy/public/
-            umask 066
-            ln -s ${configFile} /var/lib/dashy/public/conf.yml
-            umask 000
           fi
-  
+
+          ln -s ${configFile} /var/lib/dashy/public/conf.yml
+
           node ${package}/lib/node_modules/Dashy/server
         '';
-      
+
         serviceConfig = {
           Type = "simple";
           Restart = "always";
