@@ -6,7 +6,10 @@
       url = "github:hercules-ci/gitignore.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    dream2nix.url = "github:nix-community/dream2nix";
+    dream2nix = {
+      url = "github:nix-community/dream2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     dashy-src = {
       url = "github:lissy93/dashy?ref=2.1.1";
       flake = false;

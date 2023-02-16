@@ -117,7 +117,7 @@ sections:
             cp -R ${package}/lib/node_modules/Dashy/public/ /var/lib/dashy/public/
           fi
 
-          ln -s ${configFile} /var/lib/dashy/public/conf.yml
+          ln -f -s ${configFile} /var/lib/dashy/public/conf.yml
 
           node ${package}/lib/node_modules/Dashy/server
         '';
