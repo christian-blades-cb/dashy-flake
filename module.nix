@@ -84,6 +84,13 @@ sections:
       description = "Config, in yaml, sorry. To persist changes made in the UI, export the config and paste it here.";
     };
 
+    mutableConfig = lib.mkOption rec {
+      type = lib.types.bool;
+      description = "allow mutation via the interactive editor";
+      default = true;
+      example = default;
+    };
+
   };
 
   config = lib.mkIf cfg.enable {
@@ -114,13 +121,22 @@ sections:
           if [ ! -d /var/lib/dashy/public ]; then
             umask 077
             mkdir -p /var/lib/dashy/public
-            cp -R ${package}/lib/node_modules/Dashy/public/ /var/lib/dashy/public/
+            cp -R ${package}/lib/node_modules/Dashy/public/* /var/lib/dashy/public/
+            rm /var/lib/dashy/public/conf.yml
           fi
-
+        ''
+        + (if cfg.mutableConfig then ''
+          if [ ! -e /var/lib/dashy/public/conf.yml ]; then
+            cp ${configFile} /var/lib/dashy/public/conf.yml
+            chmod 0600 /var/lib/dashy/public/conf.yml
+          fi
+        '' else ''
           ln -f -s ${configFile} /var/lib/dashy/public/conf.yml
-
+        '') +
+        ''
           node ${package}/lib/node_modules/Dashy/server
-        '';
+        ''
+        ;
 
         serviceConfig = {
           Type = "simple";
